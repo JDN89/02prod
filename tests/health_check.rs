@@ -8,8 +8,8 @@ fn spawn_app() -> String {
         .expect("Failed to bind random port");
 // We retrieve the port assigned to us by the OS
     let port = listener.local_addr().unwrap().port();
-    let server = zero2prod::run(listener).expect("Failed to bind address");
-    let _ = tokio::spawn(server);
+    let server = zero2prod::startup::run(listener).expect("Failed to bind address");
+    let _ = spawn(server);
 // We return the application address to the caller!
     format!("http://127.0.0.1:{}", port)
 }
@@ -21,6 +21,7 @@ fn spawn_app() -> String {
 // `cargo expand --test health_check` (<- name of the test file)
 
 use std::net::TcpListener;
+use tokio::spawn;
 
 #[tokio::test]
 async fn health_check_works() {
