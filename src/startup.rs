@@ -1,7 +1,7 @@
 //! src/lib.rs
 use std::net::TcpListener;
 
-use actix_web::{App, HttpResponse, HttpServer, web};
+use actix_web::{App, HttpServer, web};
 use actix_web::dev::Server;
 use sqlx::PgPool;
 

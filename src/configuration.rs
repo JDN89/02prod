@@ -33,4 +33,13 @@ impl DatabaseSettings {
             self.username, self.password, self.host, self.port, self.database_name
         )
     }
+    // for test setup
+    //spin up a brand-new logical database for each integration test.
+    //create a new logical database with a unique name;
+    pub fn connection_string_without_db(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}",
+            self.username, self.password, self.host, self.port
+        )
+    }
 }

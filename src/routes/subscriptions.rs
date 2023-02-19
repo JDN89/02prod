@@ -1,9 +1,7 @@
-use std::net::TcpListener;
 
 use actix_web::{HttpResponse, web};
 use chrono::Utc;
-use sqlx::{Error, PgPool};
-use sqlx::postgres::PgQueryResult;
+use sqlx::{ PgPool};
 use uuid::Uuid;
 
 // In Rust, by default, items defined within a module are private and cannot be accessed from outside the module.
