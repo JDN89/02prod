@@ -2,6 +2,7 @@ use actix_web::{HttpResponse, web};
 use chrono::Utc;
 use sqlx::{PgPool};
 use tracing::info;
+use tracing::Instrument;
 use uuid::Uuid;
 
 
@@ -32,6 +33,13 @@ subscriber_name = %form.name
 // See the following section on `Instrumenting Futures`
     let _request_span_guard = request_span.enter();
 
+// We do not call `.enter` on query_span!
+// `.instrument` takes care of it at the right moments
+// in the query future lifetime
+    let query_span = tracing::info_span!(
+"Saving new subscriber details in the database"
+);
+
 // [...]
 // `_request_span_guard` is dropped at the end of `subscribe`
 // That's when we "exit" the span
@@ -52,21 +60,23 @@ Utc::now()
 )
 // We use `get_ref` to get an immutable reference to the `PgConnection`
 // wrapped by `web::Data`.
-.execute(pool.get_ref())
-.await {
-Ok(_) => {
-info ! (
+        .execute(pool.get_ref())
+        // First we attach the instrumentation, then we `.await` it
+        .instrument(query_span)
+        .await {
+        Ok(_) => {
+            info!(
 "request_id {} - New subscriber details have been saved",
 request_id
 );
-HttpResponse::Ok().finish()
-}
+            HttpResponse::Ok().finish()
+        }
 
-Err(e) => {
-// Using `println!` to capture information about the error
-// in case things don't work out as expected
-tracing::error ! ("Failed to execute query: {:?}", e);
-HttpResponse::InternalServerError().finish()
-}
-}
+        Err(e) => {
+            // Yes, this error log falls outside of `query_span`
+            // We'll rectify it later, pinky swear!
+            tracing::error!("Failed to execute query: {:?}", e);
+            HttpResponse::InternalServerError().finish()
+        }
+    }
 }
