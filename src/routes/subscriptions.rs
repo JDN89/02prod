@@ -1,10 +1,9 @@
 use actix_web::{HttpResponse, web};
 use chrono::Utc;
-use sqlx::{PgPool};
+use sqlx::PgPool;
 use tracing::info;
 use tracing::Instrument;
 use uuid::Uuid;
-
 
 // In Rust, by default, items defined within a module are private and cannot be accessed from outside the module.
 // If you want to make an item publicly accessible,
@@ -25,7 +24,6 @@ subscriber_email = % form.email,
 subscriber_name = % form.name
 )
 )]
-
 pub async fn subscribe(
     form: web::Form<FormData>,
     pool: web::Data<PgPool>,
@@ -36,6 +34,7 @@ pub async fn subscribe(
         Err(_) => HttpResponse::InternalServerError().finish()
     }
 }
+
 #[tracing::instrument(
 name = "Saving new subscriber details in the database",
 skip(form, pool)

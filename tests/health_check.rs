@@ -4,20 +4,22 @@
 // if we fail to perform the required setup we can just panic and crash
 // all the things.
 
-use zero2prod::configuration::{DatabaseSettings, get_configuration};
-use sqlx::{Connection, Executor, PgConnection, PgPool};
-use zero2prod::startup::run;
 use std::net::TcpListener;
-use uuid::Uuid;
-use zero2prod::telemetry::{get_subscriber, init_subscriber};
+
 use once_cell::sync::Lazy;
 use secrecy::ExposeSecret;
+use sqlx::{Connection, Executor, PgConnection, PgPool};
+use uuid::Uuid;
 
+use zero2prod::configuration::{DatabaseSettings, get_configuration};
+use zero2prod::startup::run;
+use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
 pub struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
 }
+
 async fn spawn_app() -> TestApp {
     // Ensure that the `tracing` stack is only initialised once using `once_cell`
     static TRACING: Lazy<()> = Lazy::new(|| {
@@ -31,20 +33,18 @@ async fn spawn_app() -> TestApp {
             let subscriber = get_subscriber(
                 subscriber_name,
                 default_filter_level,
-                std::io::stdout
+                std::io::stdout,
             );
             init_subscriber(subscriber);
         } else {
             let subscriber = get_subscriber(
                 subscriber_name,
                 default_filter_level,
-                std::io::sink
+                std::io::sink,
             );
             init_subscriber(subscriber);
         };
     });
-
-
 
     let listener = TcpListener::bind("127.0.0.1:0")
         .expect("Failed to bind random port");
