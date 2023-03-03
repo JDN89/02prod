@@ -41,7 +41,8 @@ features = [
     "postgres",
     "uuid",
     "chrono",
-    "migrate"
+    "migrate",
+    "offline"
 ]
 
 # Dev dependencies are used exclusively when running tests or examples
