@@ -1,6 +1,6 @@
 name: Rust
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -37,6 +37,9 @@ jobs:
         run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
+      - name: Check sqlx-data.json is up-to-date
+        run: |
+          cargo sqlx prepare --check -- --bin zero2prod
       - name: Run tests
         run: cargo test
 
